@@ -43,8 +43,8 @@ namespace CacheCo.Console.Host
                 System.Console.WriteLine(user.FirstName);
             }           
 
-            inMem.Remove(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2"));
-
+            
+            cache.Refresh(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2")).Wait();
             var user2 = cache.Get<User>(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2")).GetAwaiter().GetResult();
 
 

@@ -37,7 +37,9 @@ namespace CacheCo.Provider
                 var distributedValue = await _distributedCache.GetStringAsync(key);
                 if (!string.IsNullOrWhiteSpace(distributedValue))
                 {
-                    return JsonConvert.DeserializeObject<T>(distributedValue);
+                   var value = JsonConvert.DeserializeObject<T>(distributedValue);
+                   _memoryCache.Set(key, value);
+                   return value;
                 }
 
             }
@@ -103,21 +105,31 @@ namespace CacheCo.Provider
             {
                 return;
             }
-            var expiration = absoluteExpiration != null ? absoluteExpiration.Value - DateTimeOffset.Now : TimeSpan.FromMinutes(10);
             try
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(expiration);
-
-                _memoryCache.Set(key, value, cacheEntryOptions);
-
-                var absoluteExpirationOptions = new DistributedCacheEntryOptions
+                if (absoluteExpiration.HasValue)
                 {
-                    AbsoluteExpiration = absoluteExpiration != null ? absoluteExpiration.Value : DateTimeOffset.Now.AddMinutes(10)
-                };
-                
-                var serialized = JsonConvert.SerializeObject(value);
-                await _distributedCache.SetStringAsync(key, serialized, absoluteExpirationOptions);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions();
+                    cacheEntryOptions.SetAbsoluteExpiration(absoluteExpiration.Value);
+
+                    _memoryCache.Set(key, value, cacheEntryOptions);
+                    var absoluteExpirationOptions = new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpiration = absoluteExpiration
+                    };
+
+                    var serialized = JsonConvert.SerializeObject(value);
+                    await _distributedCache.SetStringAsync(key, serialized, absoluteExpirationOptions);
+                }
+                else
+                {
+                    _memoryCache.Set(key, value);
+                    var serialized = JsonConvert.SerializeObject(value);
+                    await _distributedCache.SetStringAsync(key, serialized);
+                }
+
+
+
             }
             catch (Exception ex)
             {
@@ -131,20 +143,30 @@ namespace CacheCo.Provider
             {
                 return;
             }
-            var defaultExpiration = TimeSpan.FromMinutes(10);
             try
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(slidingExpiration != null ? slidingExpiration.Value : defaultExpiration);
-
-                _memoryCache.Set(key, value, cacheEntryOptions);
-
-                var slidingExpirationOptions = new DistributedCacheEntryOptions
+                if(slidingExpiration.HasValue)
                 {
-                    SlidingExpiration = slidingExpiration != null ? slidingExpiration.Value : defaultExpiration
-                };
-                var serialized = JsonConvert.SerializeObject(value);
-                await _distributedCache.SetStringAsync(key, serialized, slidingExpirationOptions);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(slidingExpiration.Value);
+
+                    _memoryCache.Set(key, value, cacheEntryOptions);
+
+                    var slidingExpirationOptions = new DistributedCacheEntryOptions
+                    {
+                        SlidingExpiration = slidingExpiration 
+                    };
+                    var serialized = JsonConvert.SerializeObject(value);
+                    await _distributedCache.SetStringAsync(key, serialized, slidingExpirationOptions);
+
+                }
+                else
+                {
+                    _memoryCache.Set(key, value);
+                    var serialized = JsonConvert.SerializeObject(value);
+                    await _distributedCache.SetStringAsync(key, serialized);
+                }
+
 
             }
             catch (Exception ex)
