@@ -41,15 +41,11 @@ namespace CacheCo.Console.Host
             {
                 var user = test.GetAbsoluteUser(i).GetAwaiter().GetResult();
                 System.Console.WriteLine(user.FirstName);
-            }
-
-           
-
-            cache.Refresh(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "1"));
+            }           
 
             inMem.Remove(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2"));
 
-            var user2 = cache.Get<User>(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2"));
+            var user2 = cache.Get<User>(CacheKeyHelper.CreateCacheCoKey("testscopeA", "User", "2")).GetAwaiter().GetResult();
 
 
             System.Console.ReadKey();
