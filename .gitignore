@@ -1,0 +1,60 @@
+# Ignore Visual Studio files
+.vs/
+*.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# Ignore NuGet packages
+## If you have NuGet Package Restore enabled, uncomment the next line
+# packages/
+## .NET Core
+*.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Ignore build output
+bin/
+obj/
+
+# Ignore Visual Studio profiler files
+*.vsp
+
+# Ignore Resharper and Rider
+_ReSharper*/
+*.resharper
+*.DotSettings.user
+
+# Ignore SQL Server files
+*.bak
+*.ldf
+*.mdf
+
+# Ignore Rider
+.idea/
+
+# Ignore GhostDoc plugin setting file
+*.GhostDoc.xml
+
+# Ignore Rider
+.idea/
+
+# Ignore Rider settings
+*.idearunsettings
+
+# Ignore Xamarin
+*.xcuserdata
+*.xcworkspace
+
+# Ignore build
+build/
+
+# Ignore Rider
+.idea/
+
+# Ignore Rider settings
+*.idearunsettings
+
+# Ignore Rider
+.idea/
