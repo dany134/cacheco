@@ -38,7 +38,11 @@ namespace CacheCo.Provider
                 if (!string.IsNullOrWhiteSpace(distributedValue))
                 {
                    var value = JsonConvert.DeserializeObject<T>(distributedValue);
-                   _memoryCache.Set(key, value);
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+
+                    _memoryCache.Set(key, value, cacheEntryOptions);
                    return value;
                 }
 
@@ -62,19 +66,9 @@ namespace CacheCo.Provider
             {
                 await _distributedCache.RefreshAsync(key);
 
+                //according to Microsoft just by accessing cached item should refresh the chached data
                 object cachedValue = _memoryCache.Get(key);
 
-                if (cachedValue != null)
-                {
-                    if (_memoryCache.TryGetValue(key + "-options", out MemoryCacheEntryOptions existingOptions))
-                    {
-                        _memoryCache.Set(key, cachedValue, existingOptions);
-                    }
-                    else
-                    {
-                        _memoryCache.Set(key, cachedValue);
-                    }
-                }
             }
             catch (Exception ex)
             {
